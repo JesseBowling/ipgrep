@@ -1,0 +1,58 @@
+[project]
+name = "ipgrep"
+version = "0.1.0"
+description = "A modular command line utility for extracting and enriching IP addresses from text"
+readme = "README.md"
+authors = [
+    { name = "Jesse Bowling", email = "jessebowling@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "requests-mock>=1.11.0",
+]
+
+[project.scripts]
+ipgrep = "ipgrep.cli:main"
+
+[project.entry-points."ipgrep.enrichment"]
+ipaddress = "ipgrep.plugins.enrichment.ipaddress_enrichment:IPAddressEnrichment"
+origin = "ipgrep.plugins.enrichment.asn_origin:OriginEnrichment"
+peer = "ipgrep.plugins.enrichment.asn_peer:PeerEnrichment"
+prefix = "ipgrep.plugins.enrichment.asn_prefix:PrefixEnrichment"
+
+[project.entry-points."ipgrep.output"]
+plain = "ipgrep.plugins.output.plain:PlainOutput"
+csv = "ipgrep.plugins.output.csv:CSVOutput"
+json = "ipgrep.plugins.output.json:JSONOutput"
+space = "ipgrep.plugins.output.space_delimited:SpaceDelimitedOutput"
+pipe = "ipgrep.plugins.output.pipe_delimited:PipeDelimitedOutput"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--cov=ipgrep --cov-report=term-missing --cov-report=html"
+
+[dependency-groups]
+dev = [
+    "black>=25.9.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "requests-mock>=1.12.1",
+]
