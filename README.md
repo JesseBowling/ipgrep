@@ -470,32 +470,34 @@ uv run black src tests
 
 ```
 ipgrep/
-   src/
-      ipgrep/
-          __init__.py
-          cli.py                 # CLI interface
-          core.py                # Core processing pipeline
-          extractor.py           # IP/CIDR extraction logic
-          plugins/
-              base.py            # Base plugin classes
-              enrichment/
-                 ipaddress_enrichment.py
-                 asn_base.py               # Base ASN plugin
-                 asn_origin.py             # Origin ASN enrichment
-                 asn_peer.py               # Peer ASN enrichment
-                 asn_prefix.py             # Prefix ASN enrichment
-              output/
-                  plain.py
-                  csv.py
-                  json.py
-                  space_delimited.py
-                  pipe_delimited.py
-   tests/
-      test_core.py
-      test_enrichment.py
-      test_extractor.py
-      test_output.py
-   pyproject.toml
+        src/
+            ipgrep/
+                __init__.py
+                cli.py                 # CLI interface
+                core.py                # Core processing pipeline
+                extractor.py           # IP/CIDR extraction logic
+                plugins/
+                base.py            # Base plugin classes
+                    enrichment/
+                        ipaddress_enrichment.py
+                        asn_base.py               # Base ASN plugin
+                        asn_origin.py             # Origin ASN enrichment
+                        asn_peer.py               # Peer ASN enrichment
+                        asn_prefix.py             # Prefix ASN enrichment
+                    output/
+                        plain.py
+                        csv.py
+                        json.py
+                        space_delimited.py
+                        pipe_delimited.py
+    tests/
+        test_asn_enrichment.py
+        test_core.py
+        test_enrichment.py
+        test_extractor.py
+        test_output.py
+pyproject.toml
+README.md
 ```
 
 ## Requirements
