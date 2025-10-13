@@ -161,3 +161,103 @@ class TestEdgeCases:
         result = extractor.extract(text)
         # Should extract just the IP, not the port
         assert ("192.168.1.1", None) in result
+
+
+class TestDefangedIPs:
+    """Test defanged IP address extraction."""
+
+    def test_square_bracket_defanged_ipv4(self):
+        """Test IPv4 with square bracket defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "Malicious IP: 192[.]168[.]1[.]100"
+        result = extractor.extract(text)
+        assert ("192.168.1.100", None) in result
+
+    def test_partial_square_bracket_defanged(self):
+        """Test partially defanged IPv4."""
+        extractor = IPExtractor(defang=True)
+        text = "IOC: 10.0[.]0[.]1"
+        result = extractor.extract(text)
+        assert ("10.0.0.1", None) in result
+
+    def test_parenthesis_defanged_ipv4(self):
+        """Test IPv4 with parenthesis defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "Threat: 8(.)8(.)8(.)8"
+        result = extractor.extract(text)
+        assert ("8.8.8.8", None) in result
+
+    def test_dot_text_defanged_lowercase(self):
+        """Test IPv4 with [dot] text defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "Bad IP: 1[dot]2[dot]3[dot]4"
+        result = extractor.extract(text)
+        assert ("1.2.3.4", None) in result
+
+    def test_dot_text_defanged_uppercase(self):
+        """Test IPv4 with [DOT] text defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "Indicator: 172[DOT]16[DOT]0[DOT]1"
+        result = extractor.extract(text)
+        assert ("172.16.0.1", None) in result
+
+    def test_dot_text_defanged_mixed_case(self):
+        """Test IPv4 with mixed case [DoT] text defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "IP: 10[DoT]20[dOt]30[DOT]40"
+        result = extractor.extract(text)
+        assert ("10.20.30.40", None) in result
+
+    def test_paren_dot_text_defanged(self):
+        """Test IPv4 with (dot) text defanging."""
+        extractor = IPExtractor(defang=True)
+        text = "C2: 203(dot)0(dot)113(dot)5"
+        result = extractor.extract(text)
+        assert ("203.0.113.5", None) in result
+
+    def test_defanged_with_cidr(self):
+        """Test defanged IPv4 with CIDR notation."""
+        extractor = IPExtractor(extract_cidr=True, defang=True)
+        text = "Network: 192[.]168[.]0[.]0/24"
+        result = extractor.extract(text)
+        assert ("192.168.0.0", "24") in result
+
+    def test_multiple_defanged_ips(self):
+        """Test extracting multiple defanged IPs."""
+        extractor = IPExtractor(defang=True)
+        text = "IPs: 10[.]0[.]0[.]1 and 192[.]168[.]1[.]1"
+        result = extractor.extract(text)
+        assert len(result) == 2
+        assert ("10.0.0.1", None) in result
+        assert ("192.168.1.1", None) in result
+
+    def test_mixed_defanged_patterns(self):
+        """Test mixed defanging patterns in same text."""
+        extractor = IPExtractor(defang=True)
+        text = "IPs: 1[.]2[.]3[.]4 and 5(dot)6(dot)7(dot)8"
+        result = extractor.extract(text)
+        assert len(result) == 2
+        assert ("1.2.3.4", None) in result
+        assert ("5.6.7.8", None) in result
+
+    def test_defanged_with_enrichment(self):
+        """Test defanged IP can be enriched."""
+        extractor = IPExtractor(defang=True, extract_cidr=True)
+        text = "Threat: 8[.]8[.]8[.]8"
+        result = extractor.extract(text)
+        assert ("8.8.8.8", "32") in result
+
+    def test_defang_disabled_by_default(self):
+        """Test that defanging is not applied when disabled."""
+        extractor = IPExtractor(defang=False)
+        text = "IP: 192[.]168[.]1[.]1"
+        result = extractor.extract(text)
+        # Should not extract defanged IP when defang=False
+        assert len(result) == 0
+
+    def test_normal_ips_still_work_with_defang_enabled(self):
+        """Test that normal IPs still work when defang is enabled."""
+        extractor = IPExtractor(defang=True)
+        text = "Normal IP: 192.168.1.1"
+        result = extractor.extract(text)
+        assert ("192.168.1.1", None) in result

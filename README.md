@@ -140,6 +140,29 @@ Extract with CIDR notation (adds /32 or /128 for host IPs):
 2001:db8::/32
 ```
 
+### Defanged IP Addresses
+
+Extract defanged IP addresses commonly shared in threat intelligence. The `-g` (greedy) flag handles various defanging patterns:
+
+**Supported defanging patterns:**
+- Square brackets: `192[.]168[.]1[.]1`
+- Parentheses: `192(.)168(.)1(.)1`
+- Text replacements: `192[dot]168[dot]1[dot]1` or `192[DOT]168[DOT]1[DOT]1`
+- Mixed patterns: `192.168[.]1[.]1`
+
+```bash
+# echo "Malicious IP: 192[.]168[.]1[.]100" | ipgrep -g
+192.168.1.100
+
+# echo "IOC: 10[dot]0[dot]0[dot]1" | ipgrep -g
+10.0.0.1
+
+# Can combine with other options
+# echo "Threat: 8[.]8[.]8[.]8" | ipgrep -g -e ss_origin
+ip,ss_origin_as_name,ss_origin_asn,ss_origin_prefix
+8.8.8.8,Google LLC,15169,8.8.8.0/24
+```
+
 ### Enrichment
 
 Enrich IPs with classification data (defaults to CSV output):
@@ -418,6 +441,7 @@ ipgrep handles various edge cases:
 - **Punctuation**: IPs surrounded by punctuation are correctly identified
 - **Validation**: All extracted IPs are validated before output
 - **Deduplication**: Duplicate IPs are automatically removed
+- **Defanged IPs**: Use `-g` flag to handle defanged IPs commonly found in threat intelligence reports (e.g., `1[.]2[.]3[.]4`, `1[dot]2[dot]3[dot]4`)
 
 ## Development
 

@@ -22,6 +22,9 @@ Examples:
   # Extract IPs with CIDR notation
   ipgrep -c -f logfile.txt
 
+  # Extract defanged IPs
+  ipgrep -g -f threat_intel.txt
+
   # Enrich with ipaddress classification (defaults to CSV output)
   ipgrep -e ipaddress -f logfile.txt
 
@@ -48,6 +51,13 @@ Examples:
         "--cidr",
         action="store_true",
         help="Extract/default CIDR notation for IP addresses",
+    )
+
+    parser.add_argument(
+        "-g",
+        "--defang",
+        action="store_true",
+        help="Handle defanged IPs (e.g., 1[.]2[.]3[.]4 or 1[dot]2[dot]3[dot]4)",
     )
 
     parser.add_argument(
@@ -146,6 +156,7 @@ Examples:
     # Create pipeline and process
     pipeline = IPGrepPipeline(
         extract_cidr=args.cidr,
+        defang=args.defang,
         enrichments=enrichments,
         output_plugin=output_plugin,
     )

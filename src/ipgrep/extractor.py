@@ -22,14 +22,16 @@ class IPExtractor:
     # URL pattern to detect if IP is in a URL context
     URL_PATTERN = r"(?:https?://|ftp://|file://)"
 
-    def __init__(self, extract_cidr: bool = False):
+    def __init__(self, extract_cidr: bool = False, defang: bool = False):
         """Initialize the IP extractor.
 
         Args:
             extract_cidr: If True, also extract CIDR notation and add default
                          CIDR for IPs without it.
+            defang: If True, handle defanged IPs (e.g., 1[.]2[.]3[.]4).
         """
         self.extract_cidr = extract_cidr
+        self.defang = defang
 
     def extract(self, text: str) -> Set[Tuple[str, str]]:
         """Extract unique IP addresses from text.
@@ -41,6 +43,10 @@ class IPExtractor:
             Set of tuples (ip_address, cidr) where cidr is the CIDR notation
             or None if not extracted/applicable.
         """
+        # Preprocess text to handle defanged IPs if enabled
+        if self.defang:
+            text = self._refang_text(text)
+
         results = set()
 
         # Extract IPv4 addresses
@@ -155,6 +161,36 @@ class IPExtractor:
                 results.add((ip_str, cidr))
 
         return results
+
+    @staticmethod
+    def _refang_text(text: str) -> str:
+        """Convert defanged text to standard format.
+
+        Replaces common defanging patterns:
+        - [.] -> .
+        - [dot] -> . (case insensitive)
+        - (.) -> .
+        - (dot) -> . (case insensitive)
+
+        Args:
+            text: The text potentially containing defanged IPs.
+
+        Returns:
+            Text with defanged patterns replaced.
+        """
+        # Replace [.] with .
+        text = text.replace("[.]", ".")
+
+        # Replace (.) with .
+        text = text.replace("(.)", ".")
+
+        # Replace [dot] and [DOT] with . (case insensitive)
+        text = re.sub(r'\[dot\]', '.', text, flags=re.IGNORECASE)
+
+        # Replace (dot) and (DOT) with . (case insensitive)
+        text = re.sub(r'\(dot\)', '.', text, flags=re.IGNORECASE)
+
+        return text
 
     @staticmethod
     def _validate_ip(ip_str: str) -> bool:

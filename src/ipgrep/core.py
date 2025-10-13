@@ -11,6 +11,7 @@ class IPGrepPipeline:
     def __init__(
         self,
         extract_cidr: bool = False,
+        defang: bool = False,
         enrichments: List[EnrichmentPlugin] = None,
         output_plugin: OutputPlugin = None,
     ):
@@ -18,10 +19,11 @@ class IPGrepPipeline:
 
         Args:
             extract_cidr: Whether to extract/default CIDR notation.
+            defang: Whether to handle defanged IPs (e.g., 1[.]2[.]3[.]4).
             enrichments: List of enrichment plugins to apply in order.
             output_plugin: The output plugin to use for formatting.
         """
-        self.extractor = IPExtractor(extract_cidr=extract_cidr)
+        self.extractor = IPExtractor(extract_cidr=extract_cidr, defang=defang)
         self.enrichments = enrichments or []
         self.output_plugin = output_plugin
         self.extract_cidr = extract_cidr
