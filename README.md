@@ -386,6 +386,101 @@ The ASN enrichment plugins use the public Shadowserver API, which:
 
 For more information, see the [Shadowserver API documentation](https://www.shadowserver.org/what-we-do/network-reporting/api-documentation/).
 
+## IPInfo Enrichment
+
+The `ipinfo` enrichment plugin uses the [ipinfo-db Python library](https://github.com/ipinfo/python-db) to provide comprehensive IP geolocation, ASN, and organization data.
+
+### Features
+
+- **Automatic database management**: Downloads and caches IPInfo database locally via ipinfo-db library
+- **Smart updates**: Automatically refreshes database if older than 1 day
+- **Comprehensive data**: Returns all available IP details including geolocation, ASN, organization, and more
+- **IPv4 and IPv6 support**: Full support for both address types
+- **Field prefixing**: All fields prefixed with "ipinfo" to avoid conflicts
+
+### Setup
+
+The plugin requires an IPInfo.io access token, which can be obtained for free at [IPInfo.io](https://ipinfo.io/signup).
+
+**Set the environment variable:**
+```bash
+export IPINFO_ACCESS_TOKEN="your_token_here"
+```
+
+**Verify the plugin is available:**
+```bash
+ipgrep --list-enrichments
+```
+
+### Usage
+
+The plugin automatically downloads the IPInfo database on first use. The database is checked for freshness on each initialization, and if it's older than 1 day, a fresh copy is automatically downloaded.
+
+**Basic usage (CSV, default):**
+```bash
+# echo "8.8.8.8" | ipgrep -e ipinfo
+ip,ipinfo_country,ipinfo_country_name,ipinfo_continent,ipinfo_continent_name,ipinfo_asn,ipinfo_as_name,ipinfo_as_domain
+8.8.8.8,US,United States,NA,North America,AS15169,Google LLC,google.com
+```
+
+**JSON output:**
+```bash
+# echo "8.8.8.8" | ipgrep -e ipinfo -o json
+[{"ip": "8.8.8.8", "ipinfo_country": "US", "ipinfo_country_name": "United States", "ipinfo_continent": "NA", "ipinfo_continent_name": "North America", "ipinfo_asn": "AS15169", "ipinfo_as_name": "Google LLC", "ipinfo_as_domain": "google.com"}]
+```
+
+**Combine with other enrichments:**
+```bash
+# echo "8.8.8.8" | ipgrep -e ipaddress -e ipinfo
+ip,classification,ipinfo_country,ipinfo_country_name,ipinfo_asn,ipinfo_as_name
+8.8.8.8,global,US,United States,AS15169,Google LLC
+```
+
+### Output Fields
+
+The plugin returns all available fields from the IPInfo database using the `getDetails()` method. Available fields depend on the IPInfo database tier, but typically include:
+
+- `ipinfo_country` - Two-letter country code
+- `ipinfo_country_name` - Full country name
+- `ipinfo_continent` - Two-letter continent code
+- `ipinfo_continent_name` - Full continent name
+- `ipinfo_asn` - Autonomous System Number (e.g., AS15169)
+- `ipinfo_as_name` - ASN organization name
+- `ipinfo_as_domain` - ASN domain
+- `ipinfo_error` - Error indicator if lookup fails
+
+Additional fields may be available depending on your IPInfo database subscription.
+
+### Database Management
+
+- **Automatic downloads**: Database is downloaded automatically on first use
+- **Smart refresh**: Database is checked on each plugin initialization and refreshed if older than 1 day
+- **Location**: Managed by ipinfo-db library (typically in user cache directory)
+- **Manual refresh**: Database will be automatically refreshed on next use after 1 day
+
+### Error Handling
+
+If the `IPINFO_ACCESS_TOKEN` environment variable is not set, the plugin will log an error and fail to initialize:
+
+```
+ERROR: IPINFO_ACCESS_TOKEN environment variable is required but not set. Please set it to your IPInfo.io access token.
+```
+
+If IP lookup fails, an error field will be added to the output:
+- `ipinfo_error: client_not_initialized` - Client failed to initialize
+- `ipinfo_error: not_found` - No data found for this IP
+- `ipinfo_error: lookup_failed` - Lookup operation failed
+
+### Requirements
+
+- IPInfo.io access token (free tier available at https://ipinfo.io/signup)
+- `ipinfo-db` Python library (automatically installed as dependency)
+- Internet connection for database downloads
+
+For more information, see:
+- [IPInfo.io Documentation](https://ipinfo.io/developers)
+- [ipinfo-db Python Library](https://github.com/ipinfo/python-db)
+
 ## Plugin Development
 
 ### Creating an Enrichment Plugin
@@ -481,6 +576,7 @@ ipgrep/
                         asn_origin.py          # Origin ASN enrichment
                         asn_peer.py            # Peer ASN enrichment
                         asn_prefix.py          # Prefix ASN enrichment
+                        ipinfo.py              # IPInfo enrichment
                     output/
                         plain.py
                         csv.py
@@ -502,6 +598,7 @@ README.md
 - Python 3.11+
 - Standard library only for core functionality
 - `requests` library for ASN enrichment plugins (optional)
+- `ipinfo-db` library for IPInfo enrichment plugin (optional)
 
 ## License
 

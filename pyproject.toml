@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.11"
 dependencies = [
     "requests>=2.31.0",
+    "ipinfo-db>=0.0.4",
 ]
 
 [project.optional-dependencies]
@@ -27,6 +28,7 @@ ipaddress = "ipgrep.plugins.enrichment.ipaddress_enrichment:IPAddressEnrichment"
 asn_origin = "ipgrep.plugins.enrichment.asn_origin:OriginEnrichment"
 asn_peer = "ipgrep.plugins.enrichment.asn_peer:PeerEnrichment"
 asn_prefix = "ipgrep.plugins.enrichment.asn_prefix:PrefixEnrichment"
+ipinfo = "ipgrep.plugins.enrichment.ipinfo:IPInfoEnrichment"
 
 [project.entry-points."ipgrep.output"]
 plain = "ipgrep.plugins.output.plain:PlainOutput"
