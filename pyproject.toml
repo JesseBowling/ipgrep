@@ -1,6 +1,6 @@
 [project]
 name = "ipgrep"
-version = "0.1.0"
+version = "0.1.1"
 description = "A modular command line utility for extracting and enriching IP addresses from text"
 readme = "README.md"
 authors = [
