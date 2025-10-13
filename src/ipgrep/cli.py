@@ -2,7 +2,6 @@
 
 import argparse
 import sys
-from typing import List
 from ipgrep.core import IPGrepPipeline
 from ipgrep.plugins.base import PluginManager
 
@@ -23,17 +22,17 @@ Examples:
   # Extract IPs with CIDR notation
   ipgrep -c -f logfile.txt
 
-  # Enrich with ipaddress classification
+  # Enrich with ipaddress classification (defaults to CSV output)
   ipgrep -e ipaddress -f logfile.txt
 
-  # Chain multiple enrichments
-  ipgrep -e ipaddress -e another -f logfile.txt
-
-  # Output as CSV
-  ipgrep -e ipaddress -o csv -f logfile.txt
+  # Chain multiple enrichments (defaults to CSV output)
+  ipgrep -e ipaddress -e origin -f logfile.txt
 
   # Output as JSON
   ipgrep -e ipaddress -o json -f logfile.txt
+
+  # Output as space-delimited
+  ipgrep -e origin -o space -f logfile.txt
         """,
     )
 
@@ -63,8 +62,8 @@ Examples:
         "-o",
         "--output",
         type=str,
-        default="plain",
-        help="Output format (default: plain)",
+        default=None,
+        help="Output format (default: plain, or csv when using enrichments)",
     )
 
     parser.add_argument(
@@ -84,6 +83,13 @@ Examples:
     # Load plugins
     enrichment_plugins = PluginManager.load_enrichment_plugins()
     output_plugins = PluginManager.load_output_plugins()
+
+    # Set output default based on whether enrichments are used
+    if args.output is None:
+        if args.enrichments:
+            args.output = "csv"
+        else:
+            args.output = "plain"
 
     # Handle list commands
     if args.list_enrichments:

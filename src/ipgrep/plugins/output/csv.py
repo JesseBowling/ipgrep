@@ -44,7 +44,7 @@ class CSVOutput(OutputPlugin):
 
         # Write CSV to string buffer
         output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator='\n')
 
         writer.writeheader()
         for ip_data in ip_data_list:

@@ -84,11 +84,13 @@ ipgrep --help
 
 Test that the package works correctly:
 ```bash
-echo "Test: 192.168.1.1" | ipgrep
-# Expected output: 192.168.1.1
+# echo "Test: 192.168.1.1" | ipgrep
+192.168.1.1
 
-echo "IPs: 192.168.1.1, 8.8.8.8" | ipgrep -e ipaddress -o json
-# Expected output: JSON with IP classifications
+# echo "IPs: 192.168.1.1, 8.8.8.8" | ipgrep -e ipaddress
+ip,classification
+192.168.1.1,private
+8.8.8.8,global
 ```
 
 ### Publishing to PyPI (Optional)
@@ -118,10 +120,9 @@ pip install ipgrep
 
 Extract IP addresses from stdin:
 ```bash
-cat logfile.txt | ipgrep
-# Output:
-# 192.168.1.1
-# 10.0.0.1
+# cat logfile.txt | ipgrep
+192.168.1.1
+10.0.0.1
 ```
 
 Extract from a file:
@@ -133,72 +134,67 @@ ipgrep -f logfile.txt
 
 Extract with CIDR notation (adds /32 or /128 for host IPs):
 ```bash
-ipgrep -c -f network_config.txt
-# Output:
-# 192.168.1.0/24
-# 192.168.1.1/32
-# 2001:db8::/32
+# ipgrep -c -f network_config.txt
+192.168.1.0/24
+192.168.1.1/32
+2001:db8::/32
 ```
 
 ### Enrichment
 
-Enrich IPs with classification data:
+Enrich IPs with classification data (defaults to CSV output):
 ```bash
-ipgrep -e ipaddress -f logfile.txt
-# Output:
-# 192.168.1.1
-# 10.0.0.1
-# 8.8.8.8
+# ipgrep -e ipaddress -f logfile.txt
+ip,classification
+192.168.1.1,private
+10.0.0.1,private
+8.8.8.8,global
 ```
 
 View classification with JSON output:
 ```bash
-ipgrep -e ipaddress -o json -f logfile.txt
-# Output:
-# [
-#   {
-#     "ip": "192.168.1.1",
-#     "classification": "private"
-#   },
-#   {
-#     "ip": "8.8.8.8",
-#     "classification": "global"
-#   }
-# ]
+# ipgrep -e ipaddress -o json -f logfile.txt
+[{"ip": "192.168.1.1", "classification": "private"}, {"ip": "10.0.0.1", "classification": "private"}, {"ip": "8.8.8.8", "classification": "global"}]
 ```
 
 ### Output Formats
 
-**CSV output:**
+**CSV output (default when using enrichments):**
 ```bash
-ipgrep -e ipaddress -o csv -f logfile.txt
-# Output:
-# ip,classification
-# 192.168.1.1,private
-# 8.8.8.8,global
+# ipgrep -e ipaddress -f logfile.txt
+ip,classification
+192.168.1.1,private
+8.8.8.8,global
 ```
 
 **Space-delimited output:**
 ```bash
-ipgrep -e ipaddress -o space -f logfile.txt
-# Output:
-# 192.168.1.1 private
-# 8.8.8.8 global
+# ipgrep -e ipaddress -o space -f logfile.txt
+192.168.1.1 private
+8.8.8.8 global
 ```
 
 **Pipe-delimited output:**
 ```bash
-ipgrep -e ipaddress -o pipe -f logfile.txt
-# Output:
-# 192.168.1.1|private
-# 8.8.8.8|global
+# ipgrep -e ipaddress -o pipe -f logfile.txt
+192.168.1.1|private
+8.8.8.8|global
+```
+
+**Plain output (default when no enrichments):**
+```bash
+# ipgrep -f logfile.txt
+192.168.1.1
+8.8.8.8
 ```
 
 ### Chaining Enrichments
 
-Chain multiple enrichments together:
+Chain multiple enrichments together (outputs CSV by default):
 ```bash
-ipgrep -e ipaddress -e another_enrichment -o json -f logfile.txt
+# ipgrep -e ipaddress -e origin -f logfile.txt
+ip,classification,origin_as_name,origin_asn,origin_prefix
+8.8.8.8,global,Google LLC,15169,8.8.8.0/24
 ```
 
 ### List Available Plugins
@@ -248,119 +244,93 @@ ipgrep includes three enrichment plugins that query ASN (Autonomous System Numbe
 
 Queries origin ASN information for an IP address.
 
-**Usage:**
-```bash
-echo "8.8.8.8" | ipgrep -e origin -o json
-```
-
 **Output fields:**
 - `origin_asn` - Origin ASN number
 - `origin_as_name` - AS name/organization
 - `origin_prefix` - Network prefix
-- `origin_cc` - Country code
-- `origin_registry` - Regional Internet Registry (ARIN, RIPE, etc.)
 - `origin_error` - Error indicator if lookup fails
 
-**Example output (JSON):**
-```json
-[
-  {
-    "ip": "8.8.8.8",
-    "origin_asn": "15169",
-    "origin_as_name": "GOOGLE",
-    "origin_prefix": "8.8.8.0/24",
-    "origin_cc": "US",
-    "origin_registry": "arin"
-  }
-]
+**Example usage (CSV, default):**
+```bash
+# echo "8.8.8.8" | ipgrep -e origin
+ip,origin_as_name,origin_asn,origin_prefix
+8.8.8.8,Google LLC,15169,8.8.8.0/24
 ```
 
-**Example output (CSV):**
+**Example output (JSON):**
 ```bash
-echo "8.8.8.8" | ipgrep -e origin -o csv
-# ip,origin_asn,origin_as_name,origin_cc,origin_prefix,origin_registry
-# 8.8.8.8,15169,GOOGLE,US,8.8.8.0/24,arin
+# echo "8.8.8.8" | ipgrep -e origin -o json
+[{"ip": "8.8.8.8", "origin_asn": "15169", "origin_as_name": "Google LLC", "origin_prefix": "8.8.8.0/24"}]
 ```
 
 ### Peer Enrichment
 
 Queries peer ASN relationships for an IP address.
 
-**Usage:**
-```bash
-echo "8.8.8.8" | ipgrep -e peer -o json
-```
-
 **Output fields:**
+- `peer_asn` - Origin ASN for this IP
+- `peer_asn_name` - Origin AS name
+- `peer_prefix` - Network prefix
 - `peer_asns` - Pipe-delimited list of peer ASN numbers
-- `peer_names` - Pipe-delimited list of peer AS names
 - `peer_count` - Number of peers
-- `peer_asn` - Origin ASN (if included in response)
-- `peer_prefix` - Network prefix (if included in response)
-- `peer_cc` - Country code (if included in response)
 - `peer_error` - Error indicator if lookup fails
 
+**Example usage (CSV, default):**
+```bash
+# echo "8.8.8.8" | ipgrep -e peer
+ip,peer_asn,peer_asn_name,peer_asns,peer_count,peer_prefix
+8.8.8.8,15169,Google LLC,1101|8220|29075|30781|37989|38195|47605|51088|60733,9,8.8.8.0/24
+```
+
 **Example output (JSON):**
-```json
-[
-  {
-    "ip": "8.8.8.8",
-    "peer_asns": "174|3356|1299",
-    "peer_names": "COGENT|LEVEL3|TELIA",
-    "peer_count": "3"
-  }
-]
+```bash
+# echo "8.8.8.8" | ipgrep -e peer -o json
+[{"ip": "8.8.8.8", "peer_asn": "15169", "peer_asn_name": "Google LLC", "peer_asns": "1101|8220|29075|30781|37989|38195|47605|51088|60733", "peer_count": "9", "peer_prefix": "8.8.8.0/24"}]
 ```
 
 ### Prefix Enrichment
 
 Queries prefix information for an ASN. This plugin automatically calls the origin plugin first to determine the ASN, then queries prefix data for that ASN.
 
-**Usage:**
-```bash
-echo "8.8.8.8" | ipgrep -e prefix -o json
-```
-
 **Output fields:**
-- All `origin_*` fields from the origin lookup
+- All `origin_*` fields from the origin lookup (asn, as_name, prefix)
 - `prefix_list` - Pipe-delimited list of prefixes for the ASN
 - `prefix_count` - Number of prefixes
-- `prefix_countries` - Pipe-delimited list of countries
-- `prefix_registries` - Pipe-delimited list of registries
 - `prefix_error` - Error indicator if lookup fails
 
-**Example output (JSON):**
-```json
-[
-  {
-    "ip": "8.8.8.8",
-    "origin_asn": "15169",
-    "origin_as_name": "GOOGLE",
-    "origin_prefix": "8.8.8.0/24",
-    "origin_cc": "US",
-    "origin_registry": "arin",
-    "prefix_list": "8.8.8.0/24|8.8.4.0/24|8.35.200.0/21",
-    "prefix_count": "3",
-    "prefix_countries": "US",
-    "prefix_registries": "arin"
-  }
-]
+**Example usage (CSV, default):**
+```bash
+# echo "8.8.8.8" | ipgrep -e prefix
+ip,origin_as_name,origin_asn,origin_prefix,prefix_count,prefix_list
+8.8.8.8,Google LLC,15169,8.8.8.0/24,983,209.85.147.0/24|209.85.128.0/17|216.239.32.0/24|...
+```
+
+**Example output (JSON, truncated):**
+```bash
+# echo "8.8.8.8" | ipgrep -e prefix -o json
+[{"ip": "8.8.8.8", "origin_asn": "15169", "origin_as_name": "Google LLC", "origin_prefix": "8.8.8.0/24", "prefix_list": "209.85.147.0/24|209.85.128.0/17|216.239.32.0/24|...", "prefix_count": "983"}]
 ```
 
 ### Chaining ASN Enrichments
 
-You can chain multiple ASN enrichments together with other enrichments:
+You can chain multiple ASN enrichments together with other enrichments (defaults to CSV output):
 
 ```bash
 # Combine origin and peer information
-echo "8.8.8.8 1.1.1.1" | ipgrep -e origin -e peer -o csv
+# echo "8.8.8.8 1.1.1.1" | ipgrep -e origin -e peer
+ip,origin_as_name,origin_asn,origin_prefix,peer_asn,peer_asn_name,peer_asns,peer_count,peer_prefix
+8.8.8.8,Google LLC,15169,8.8.8.0/24,15169,Google LLC,1101|8220|29075|...,9,8.8.8.0/24
+1.1.1.1,Cloudflare Inc,13335,1.1.1.0/24,13335,Cloudflare Inc,174|3257|3356|...,12,1.1.1.0/24
 
 # Combine IP classification with ASN data
-echo "8.8.8.8" | ipgrep -e ipaddress -e origin -o json
+# echo "8.8.8.8" | ipgrep -e ipaddress -e origin
+ip,classification,origin_as_name,origin_asn,origin_prefix
+8.8.8.8,global,Google LLC,15169,8.8.8.0/24
 
-# Get complete ASN data including prefixes
-echo "8.8.8.8" | ipgrep -e prefix -o json
-# Note: prefix automatically includes origin data
+# Get complete ASN data including prefixes (prefix automatically includes origin data)
+# echo "8.8.8.8" | ipgrep -e prefix
+ip,origin_as_name,origin_asn,origin_prefix,prefix_count,prefix_list
+8.8.8.8,Google LLC,15169,8.8.8.0/24,983,209.85.147.0/24|209.85.128.0/17|<SNIP>
 ```
 
 ### ASN Enrichment with CIDR
@@ -368,7 +338,10 @@ echo "8.8.8.8" | ipgrep -e prefix -o json
 When using CIDR notation, ASN enrichment uses only the first host IP:
 
 ```bash
-echo "8.8.8.0/24" | ipgrep -c -e origin -o json
+echo "8.8.8.0/24" | ipgrep -c -e origin
+# Output:
+# ip,cidr,origin_as_name,origin_asn,origin_prefix
+# 8.8.8.0,24,Google LLC,15169,8.8.8.0/24
 # Queries origin data for 8.8.8.0 (first host)
 ```
 
