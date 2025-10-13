@@ -1,7 +1,7 @@
 """Origin ASN enrichment plugin using Shadowserver API."""
 
 from typing import Dict, Any, List, Optional
-from ipgrep.plugins.enrichment.ss_asn_base import ASNEnrichmentBase
+from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
 
 
 class OriginEnrichment(ASNEnrichmentBase):
@@ -20,13 +20,13 @@ class OriginEnrichment(ASNEnrichmentBase):
         """Initialize Origin enrichment plugin.
 
         Args:
-            field_prefix: Custom field prefix (defaults to 'ss_origin').
+            field_prefix: Custom field prefix (defaults to 'asn_origin').
         """
         super().__init__(field_prefix)
 
     def name(self) -> str:
         """Return the name of this enrichment plugin."""
-        return "ss_origin"
+        return "asn_origin"
 
     def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
         """Enrich the IP data with origin ASN information.

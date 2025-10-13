@@ -24,9 +24,9 @@ ipgrep = "ipgrep.cli:main"
 
 [project.entry-points."ipgrep.enrichment"]
 ipaddress = "ipgrep.plugins.enrichment.ipaddress_enrichment:IPAddressEnrichment"
-ss_origin = "ipgrep.plugins.enrichment.ss_asn_origin:OriginEnrichment"
-ss_peer = "ipgrep.plugins.enrichment.ss_asn_peer:PeerEnrichment"
-ss_prefix = "ipgrep.plugins.enrichment.ss_asn_prefix:PrefixEnrichment"
+asn_origin = "ipgrep.plugins.enrichment.asn_origin:OriginEnrichment"
+asn_peer = "ipgrep.plugins.enrichment.asn_peer:PeerEnrichment"
+asn_prefix = "ipgrep.plugins.enrichment.asn_prefix:PrefixEnrichment"
 
 [project.entry-points."ipgrep.output"]
 plain = "ipgrep.plugins.output.plain:PlainOutput"

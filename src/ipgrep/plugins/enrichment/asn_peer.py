@@ -1,7 +1,7 @@
 """Peer ASN enrichment plugin using Shadowserver API."""
 
 from typing import Dict, Any, List, Optional
-from ipgrep.plugins.enrichment.ss_asn_base import ASNEnrichmentBase
+from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
 
 
 class PeerEnrichment(ASNEnrichmentBase):
@@ -17,13 +17,13 @@ class PeerEnrichment(ASNEnrichmentBase):
         """Initialize Peer enrichment plugin.
 
         Args:
-            field_prefix: Custom field prefix (defaults to 'ss_peer').
+            field_prefix: Custom field prefix (defaults to 'asn_peer').
         """
         super().__init__(field_prefix)
 
     def name(self) -> str:
         """Return the name of this enrichment plugin."""
-        return "ss_peer"
+        return "asn_peer"
 
     def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
         """Enrich the IP data with peer ASN information.
