@@ -1,8 +1,8 @@
 """Prefix ASN enrichment plugin using Shadowserver API."""
 
 from typing import Dict, Any, List, Optional
-from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
-from ipgrep.plugins.enrichment.asn_origin import OriginEnrichment
+from ipgrep.plugins.enrichment.ss_asn_base import ASNEnrichmentBase
+from ipgrep.plugins.enrichment.ss_asn_origin import OriginEnrichment
 
 
 class PrefixEnrichment(ASNEnrichmentBase):
@@ -17,15 +17,15 @@ class PrefixEnrichment(ASNEnrichmentBase):
         """Initialize Prefix enrichment plugin.
 
         Args:
-            field_prefix: Custom field prefix (defaults to 'prefix').
+            field_prefix: Custom field prefix (defaults to 'ss_prefix').
         """
         super().__init__(field_prefix)
         # Create origin plugin instance for ASN lookup
-        self._origin_plugin = OriginEnrichment(field_prefix="origin")
+        self._origin_plugin = OriginEnrichment(field_prefix="ss_origin")
 
     def name(self) -> str:
         """Return the name of this enrichment plugin."""
-        return "prefix"
+        return "ss_prefix"
 
     def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
         """Enrich the IP data with prefix ASN information.
@@ -45,14 +45,14 @@ class PrefixEnrichment(ASNEnrichmentBase):
         ip_data = self._origin_plugin.enrich(ip_data)
 
         # Check if we successfully got origin data with ASN
-        if "origin_asn" not in ip_data or ip_data.get("origin_error"):
+        if "ss_origin_asn" not in ip_data or ip_data.get("ss_origin_error"):
             # If origin lookup failed, add error and return
             prefix = self._get_field_prefix()
             ip_data[f"{prefix}_error"] = "no_origin_asn"
             return ip_data
 
         # Extract ASN from origin data
-        asn = ip_data["origin_asn"]
+        asn = ip_data["ss_origin_asn"]
 
         # Step 2: Query prefix information for this ASN
         prefix_results = self._query_prefix_for_asn(ip_str, asn)

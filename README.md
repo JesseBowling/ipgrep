@@ -192,8 +192,8 @@ ip,classification
 
 Chain multiple enrichments together (outputs CSV by default):
 ```bash
-# ipgrep -e ipaddress -e origin -f logfile.txt
-ip,classification,origin_as_name,origin_asn,origin_prefix
+# ipgrep -e ipaddress -e ss_origin -f logfile.txt
+ip,classification,ss_origin_as_name,ss_origin_asn,ss_origin_prefix
 8.8.8.8,global,Google LLC,15169,8.8.8.0/24
 ```
 
@@ -227,9 +227,9 @@ Multiple classifications are joined with a pipe delimiter (configurable).
 
 ipgrep includes three enrichment plugins that query ASN (Autonomous System Number) information using the [Shadowserver API](https://www.shadowserver.org/what-we-do/network-reporting/api-documentation/):
 
-- **origin**: Lookup origin ASN information for an IP
-- **peer**: Query peer ASN relationships
-- **prefix**: Query prefix information (automatically calls origin first)
+- **ss_origin**: Lookup origin ASN information for an IP
+- **ss_peer**: Query peer ASN relationships
+- **ss_prefix**: Query prefix information (automatically calls ss_origin first)
 
 ### Features
 
@@ -245,22 +245,22 @@ ipgrep includes three enrichment plugins that query ASN (Autonomous System Numbe
 Queries origin ASN information for an IP address.
 
 **Output fields:**
-- `origin_asn` - Origin ASN number
-- `origin_as_name` - AS name/organization
-- `origin_prefix` - Network prefix
-- `origin_error` - Error indicator if lookup fails
+- `ss_origin_asn` - Origin ASN number
+- `ss_origin_as_name` - AS name/organization
+- `ss_origin_prefix` - Network prefix
+- `ss_origin_error` - Error indicator if lookup fails
 
 **Example usage (CSV, default):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e origin
-ip,origin_as_name,origin_asn,origin_prefix
+# echo "8.8.8.8" | ipgrep -e ss_origin
+ip,ss_origin_as_name,ss_origin_asn,ss_origin_prefix
 8.8.8.8,Google LLC,15169,8.8.8.0/24
 ```
 
 **Example output (JSON):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e origin -o json
-[{"ip": "8.8.8.8", "origin_asn": "15169", "origin_as_name": "Google LLC", "origin_prefix": "8.8.8.0/24"}]
+# echo "8.8.8.8" | ipgrep -e ss_origin -o json
+[{"ip": "8.8.8.8", "ss_origin_asn": "15169", "ss_origin_as_name": "Google LLC", "ss_origin_prefix": "8.8.8.0/24"}]
 ```
 
 ### Peer Enrichment
@@ -268,47 +268,47 @@ ip,origin_as_name,origin_asn,origin_prefix
 Queries peer ASN relationships for an IP address.
 
 **Output fields:**
-- `peer_asn` - Origin ASN for this IP
-- `peer_asn_name` - Origin AS name
-- `peer_prefix` - Network prefix
-- `peer_asns` - Pipe-delimited list of peer ASN numbers
-- `peer_count` - Number of peers
-- `peer_error` - Error indicator if lookup fails
+- `ss_peer_asn` - Origin ASN for this IP
+- `ss_peer_asn_name` - Origin AS name
+- `ss_peer_prefix` - Network prefix
+- `ss_peer_asns` - Pipe-delimited list of peer ASN numbers
+- `ss_peer_count` - Number of peers
+- `ss_peer_error` - Error indicator if lookup fails
 
 **Example usage (CSV, default):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e peer
-ip,peer_asn,peer_asn_name,peer_asns,peer_count,peer_prefix
+# echo "8.8.8.8" | ipgrep -e ss_peer
+ip,ss_peer_asn,ss_peer_asn_name,ss_peer_asns,ss_peer_count,ss_peer_prefix
 8.8.8.8,15169,Google LLC,1101|8220|29075|30781|37989|38195|47605|51088|60733,9,8.8.8.0/24
 ```
 
 **Example output (JSON):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e peer -o json
-[{"ip": "8.8.8.8", "peer_asn": "15169", "peer_asn_name": "Google LLC", "peer_asns": "1101|8220|29075|30781|37989|38195|47605|51088|60733", "peer_count": "9", "peer_prefix": "8.8.8.0/24"}]
+# echo "8.8.8.8" | ipgrep -e ss_peer -o json
+[{"ip": "8.8.8.8", "ss_peer_asn": "15169", "ss_peer_asn_name": "Google LLC", "ss_peer_asns": "1101|8220|29075|30781|37989|38195|47605|51088|60733", "ss_peer_count": "9", "ss_peer_prefix": "8.8.8.0/24"}]
 ```
 
 ### Prefix Enrichment
 
-Queries prefix information for an ASN. This plugin automatically calls the origin plugin first to determine the ASN, then queries prefix data for that ASN.
+Queries prefix information for an ASN. This plugin automatically calls the ss_origin plugin first to determine the ASN, then queries prefix data for that ASN.
 
 **Output fields:**
-- All `origin_*` fields from the origin lookup (asn, as_name, prefix)
-- `prefix_list` - Pipe-delimited list of prefixes for the ASN
-- `prefix_count` - Number of prefixes
-- `prefix_error` - Error indicator if lookup fails
+- All `ss_origin_*` fields from the origin lookup (asn, as_name, prefix)
+- `ss_prefix_list` - Pipe-delimited list of prefixes for the ASN
+- `ss_prefix_count` - Number of prefixes
+- `ss_prefix_error` - Error indicator if lookup fails
 
 **Example usage (CSV, default):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e prefix
-ip,origin_as_name,origin_asn,origin_prefix,prefix_count,prefix_list
+# echo "8.8.8.8" | ipgrep -e ss_prefix
+ip,ss_origin_as_name,ss_origin_asn,ss_origin_prefix,ss_prefix_count,ss_prefix_list
 8.8.8.8,Google LLC,15169,8.8.8.0/24,983,209.85.147.0/24|209.85.128.0/17|216.239.32.0/24|...
 ```
 
 **Example output (JSON, truncated):**
 ```bash
-# echo "8.8.8.8" | ipgrep -e prefix -o json
-[{"ip": "8.8.8.8", "origin_asn": "15169", "origin_as_name": "Google LLC", "origin_prefix": "8.8.8.0/24", "prefix_list": "209.85.147.0/24|209.85.128.0/17|216.239.32.0/24|...", "prefix_count": "983"}]
+# echo "8.8.8.8" | ipgrep -e ss_prefix -o json
+[{"ip": "8.8.8.8", "ss_origin_asn": "15169", "ss_origin_as_name": "Google LLC", "ss_origin_prefix": "8.8.8.0/24", "ss_prefix_list": "209.85.147.0/24|209.85.128.0/17|216.239.32.0/24|...", "ss_prefix_count": "983"}]
 ```
 
 ### Chaining ASN Enrichments
@@ -317,19 +317,19 @@ You can chain multiple ASN enrichments together with other enrichments (defaults
 
 ```bash
 # Combine origin and peer information
-# echo "8.8.8.8 1.1.1.1" | ipgrep -e origin -e peer
-ip,origin_as_name,origin_asn,origin_prefix,peer_asn,peer_asn_name,peer_asns,peer_count,peer_prefix
+# echo "8.8.8.8 1.1.1.1" | ipgrep -e ss_origin -e ss_peer
+ip,ss_origin_as_name,ss_origin_asn,ss_origin_prefix,ss_peer_asn,ss_peer_asn_name,ss_peer_asns,ss_peer_count,ss_peer_prefix
 8.8.8.8,Google LLC,15169,8.8.8.0/24,15169,Google LLC,1101|8220|29075|...,9,8.8.8.0/24
 1.1.1.1,Cloudflare Inc,13335,1.1.1.0/24,13335,Cloudflare Inc,174|3257|3356|...,12,1.1.1.0/24
 
 # Combine IP classification with ASN data
-# echo "8.8.8.8" | ipgrep -e ipaddress -e origin
-ip,classification,origin_as_name,origin_asn,origin_prefix
+# echo "8.8.8.8" | ipgrep -e ipaddress -e ss_origin
+ip,classification,ss_origin_as_name,ss_origin_asn,ss_origin_prefix
 8.8.8.8,global,Google LLC,15169,8.8.8.0/24
 
-# Get complete ASN data including prefixes (prefix automatically includes origin data)
-# echo "8.8.8.8" | ipgrep -e prefix
-ip,origin_as_name,origin_asn,origin_prefix,prefix_count,prefix_list
+# Get complete ASN data including prefixes (ss_prefix automatically includes ss_origin data)
+# echo "8.8.8.8" | ipgrep -e ss_prefix
+ip,ss_origin_as_name,ss_origin_asn,ss_origin_prefix,ss_prefix_count,ss_prefix_list
 8.8.8.8,Google LLC,15169,8.8.8.0/24,983,209.85.147.0/24|209.85.128.0/17|<SNIP>
 ```
 
@@ -338,9 +338,9 @@ ip,origin_as_name,origin_asn,origin_prefix,prefix_count,prefix_list
 When using CIDR notation, ASN enrichment uses only the first host IP:
 
 ```bash
-echo "8.8.8.0/24" | ipgrep -c -e origin
+echo "8.8.8.0/24" | ipgrep -c -e ss_origin
 # Output:
-# ip,cidr,origin_as_name,origin_asn,origin_prefix
+# ip,cidr,ss_origin_as_name,ss_origin_asn,ss_origin_prefix
 # 8.8.8.0,24,Google LLC,15169,8.8.8.0/24
 # Queries origin data for 8.8.8.0 (first host)
 ```
@@ -453,10 +453,10 @@ ipgrep/
                 base.py            # Base plugin classes
                     enrichment/
                         ipaddress_enrichment.py
-                        asn_base.py               # Base ASN plugin
-                        asn_origin.py             # Origin ASN enrichment
-                        asn_peer.py               # Peer ASN enrichment
-                        asn_prefix.py             # Prefix ASN enrichment
+                        ss_asn_base.py            # Base ASN plugin
+                        ss_asn_origin.py          # Origin ASN enrichment
+                        ss_asn_peer.py            # Peer ASN enrichment
+                        ss_asn_prefix.py          # Prefix ASN enrichment
                     output/
                         plain.py
                         csv.py
@@ -464,7 +464,7 @@ ipgrep/
                         space_delimited.py
                         pipe_delimited.py
     tests/
-        test_asn_enrichment.py
+        test_ss_asn_enrichment.py
         test_core.py
         test_enrichment.py
         test_extractor.py

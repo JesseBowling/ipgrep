@@ -1,9 +1,9 @@
 """Tests for ASN enrichment plugins using real API calls."""
 
 import pytest
-from ipgrep.plugins.enrichment.asn_origin import OriginEnrichment
-from ipgrep.plugins.enrichment.asn_peer import PeerEnrichment
-from ipgrep.plugins.enrichment.asn_prefix import PrefixEnrichment
+from ipgrep.plugins.enrichment.ss_asn_origin import OriginEnrichment
+from ipgrep.plugins.enrichment.ss_asn_peer import PeerEnrichment
+from ipgrep.plugins.enrichment.ss_asn_prefix import PrefixEnrichment
 
 
 class TestOriginEnrichment:
