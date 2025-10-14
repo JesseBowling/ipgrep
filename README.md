@@ -16,18 +16,18 @@ A modular command line utility for extracting and enriching IP addresses (IPv4 a
 
 ## Installation
 
-### Using uv (recommended)
-
+### Using pipx (recommended for system-wide installation)
+Download the latest release from [GitHub](https://github.com/JesseBowling/ipgrep/releases) and install:
 ```bash
-git clone https://github.com/yourusername/ipgrep.git
-cd ipgrep
-uv sync
+pipx install ipgrep-0.1.1-py3-none-any.whl
 ```
 
-### Using pip
+### Using uv (recommended for local development)
 
 ```bash
-pip install .
+git clone https://github.com/JesseBowling/ipgrep.git
+cd ipgrep
+uv sync
 ```
 
 ### Development Installation
@@ -41,6 +41,7 @@ uv sync --all-extras
 To create a package that can be installed on a fresh machine:
 
 ### Build the Package
+Update the version specification in `pyproject.toml`
 
 Using uv (recommended):
 ```bash
@@ -63,17 +64,17 @@ Transfer the built package to the target machine and install:
 
 **Using the wheel (recommended):**
 ```bash
-pip install ipgrep-0.1.0-py3-none-any.whl
+pipx install ipgrep-0.1.0-py3-none-any.whl
 ```
 
 **Using the source distribution:**
 ```bash
-pip install ipgrep-0.1.0.tar.gz
+pipx install ipgrep-0.1.0.tar.gz
 ```
 
 **Direct from the dist directory:**
 ```bash
-pip install dist/ipgrep-0.1.0-py3-none-any.whl
+pipx install dist/ipgrep-0.1.0-py3-none-any.whl
 ```
 
 After installation, the `ipgrep` command will be available system-wide:
@@ -93,27 +94,6 @@ ip,classification
 192.168.1.1,private
 8.8.8.8,global
 ```
-
-### Publishing to PyPI (Optional)
-
-To make the package publicly available via PyPI:
-
-1. Install twine:
-```bash
-pip install twine
-```
-
-2. Upload to PyPI:
-```bash
-twine upload dist/*
-```
-
-3. Install from PyPI:
-```bash
-pip install ipgrep
-```
-
-**Note:** You'll need a PyPI account and proper credentials configured.
 
 ## Quick Start
 
@@ -542,15 +522,15 @@ ipgrep handles various edge cases:
 ## Development
 
 ### Running Tests
-
+Some tests are rate-limited, so you may need to run test without the `ratelimit` marker to skip them:
 ```bash
-uv run pytest
+uv run pytest -m "not ratelimit"
 ```
 
 ### With Coverage
 
 ```bash
-uv run pytest --cov=ipgrep --cov-report=html
+uv run pytest -m "not ratelimit" --cov=ipgrep --cov-report=html
 ```
 
 ### Code Formatting
@@ -596,7 +576,7 @@ README.md
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.9+
 - Standard library only for core functionality
 - `requests` library for ASN enrichment plugins (optional)
 - `ipinfo-db` library for IPInfo enrichment plugin (optional)
