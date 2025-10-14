@@ -7,7 +7,7 @@ from ipgrep.plugins.output.plain import PlainOutput
 from ipgrep.plugins.output.json import JSONOutput
 import json
 
-
+@pytest.mark.local
 class TestPipelineBasics:
     """Test basic pipeline functionality."""
 
@@ -32,7 +32,7 @@ class TestPipelineBasics:
         result = pipeline.process("")
         assert result == ""
 
-
+@pytest.mark.local
 class TestPipelineWithCIDR:
     """Test pipeline with CIDR extraction."""
 
@@ -50,7 +50,7 @@ class TestPipelineWithCIDR:
         result = pipeline.process(text)
         assert "192.168.1.1/32" in result
 
-
+@pytest.mark.local
 class TestPipelineWithEnrichment:
     """Test pipeline with enrichment plugins."""
 
@@ -77,7 +77,7 @@ class TestPipelineWithEnrichment:
         # Second enrichment should override classification with comma delimiter
         assert "classification" in parsed[0]
 
-
+@pytest.mark.local
 class TestPipelineWithOutput:
     """Test pipeline with different output formats."""
 
@@ -99,7 +99,7 @@ class TestPipelineWithOutput:
         result = pipeline.process(text)
         assert result == "192.168.1.1"
 
-
+@pytest.mark.local
 class TestEndToEnd:
     """End-to-end integration tests."""
 

@@ -97,21 +97,10 @@ class PrefixEnrichment(ASNEnrichmentBase):
         # Endpoint: /net/asn?prefix=ASN
         endpoint = "net/asn"
 
-        try:
-            response = self._session.get(
-                f"{self.API_BASE_URL}/{endpoint}",
-                params={"prefix": asn},
-                timeout=self.MAX_TIMEOUT,
-            )
-            response.raise_for_status()
+        # Use retry logic from base class
+        data = self._api_request_with_retry(endpoint, params={"prefix": asn})
 
-            # Parse response - should be JSON array of prefix strings
-            data = response.json()
-
-            return data
-
-        except Exception:
-            return None
+        return data
 
     def _query_batch(
         self, ips: List[str], query_type: str

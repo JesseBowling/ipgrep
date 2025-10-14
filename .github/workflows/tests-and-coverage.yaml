@@ -36,7 +36,9 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run pytest
-        run: uv run pytest --verbose --cov --cov-report=xml --cov-report=term
+        env:
+          IPINFO_ACCESS_TOKEN: ${{ secrets.IPINFO_ACCESS_TOKEN }}
+        run: uv run pytest -m "not ratelimit" --verbose --cov --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'

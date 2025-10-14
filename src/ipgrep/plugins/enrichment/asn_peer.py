@@ -72,30 +72,19 @@ class PeerEnrichment(ASNEnrichmentBase):
         # For bulk query, we pass IPs as comma-separated in the peer parameter
         ip_list_str = ",".join(ips)
 
-        try:
-            response = self._session.get(
-                f"{self.API_BASE_URL}/{endpoint}",
-                params={"peer": ip_list_str},
-                timeout=self.MAX_TIMEOUT,
-            )
-            response.raise_for_status()
+        # Use retry logic from base class
+        data = self._api_request_with_retry(endpoint, params={"peer": ip_list_str})
 
+        if data:
             # Parse response - JSON array of objects with ip, asn, asn_name, prefix, peer
-            data = response.json()
-
             # Map responses to IPs
             for item in data:
                 if "ip" in item:
                     results[item["ip"]] = item
 
-            # Fill in any missing results
-            for ip in ips:
-                if ip not in results:
-                    results[ip] = None
-
-        except Exception:
-            # On any error, return None for all IPs
-            for ip in ips:
+        # Fill in any missing results
+        for ip in ips:
+            if ip not in results:
                 results[ip] = None
 
         return results
