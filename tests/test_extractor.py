@@ -3,7 +3,7 @@
 import pytest
 from ipgrep.extractor import IPExtractor
 
-
+@pytest.mark.local
 class TestIPv4Extraction:
     """Test IPv4 address extraction."""
 
@@ -46,7 +46,7 @@ class TestIPv4Extraction:
         result = extractor.extract(text)
         assert len(result) == 0
 
-
+@pytest.mark.local
 class TestIPv6Extraction:
     """Test IPv6 address extraction."""
 
@@ -79,7 +79,7 @@ class TestIPv6Extraction:
         # IP from URL should be forced to /128
         assert ("2001:db8::1", "128") in result
 
-
+@pytest.mark.local
 class TestCIDRExtraction:
     """Test CIDR notation extraction."""
 
@@ -119,7 +119,7 @@ class TestCIDRExtraction:
         result = extractor.extract(text)
         assert len(result) == 0
 
-
+@pytest.mark.local
 class TestEdgeCases:
     """Test edge cases in IP extraction."""
 
@@ -162,7 +162,7 @@ class TestEdgeCases:
         # Should extract just the IP, not the port
         assert ("192.168.1.1", None) in result
 
-
+@pytest.mark.local
 class TestDefangedIPs:
     """Test defanged IP address extraction."""
 

@@ -1,4 +1,5 @@
 # ipgrep
+[![codecov](https://codecov.io/github/JesseBowling/ipgrep/graph/badge.svg?token=X35E7AM44Q)](https://codecov.io/github/JesseBowling/ipgrep)
 
 A modular command line utility for extracting and enriching IP addresses (IPv4 and IPv6) from arbitrary text.
 

@@ -50,6 +50,11 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "--cov=ipgrep --cov-report=term-missing --cov-report=html"
+markers = [
+    "local: marks tests that do not require remote access",
+    "remote: marks tests that require remote API access (deselect with '-m \"not remote\"')",
+    "ratelimit: marks tests that may encounter rate limits"
+]
 
 [dependency-groups]
 dev = [
