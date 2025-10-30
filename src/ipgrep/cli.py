@@ -1,6 +1,7 @@
 """Command line interface for ipgrep."""
 
 import argparse
+import logging
 import sys
 from ipgrep.core import IPGrepPipeline
 from ipgrep.plugins.base import PluginManager
@@ -88,7 +89,28 @@ Examples:
         help="List available output plugins and exit",
     )
 
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable DEBUG logging to stderr",
+    )
+
     args = parser.parse_args()
+
+    # Configure logging
+    if args.debug:
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s',
+            stream=sys.stderr,
+        )
+    else:
+        # Default to WARNING level
+        logging.basicConfig(
+            level=logging.WARNING,
+            format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s',
+            stream=sys.stderr,
+        )
 
     # Load plugins
     enrichment_plugins = PluginManager.load_enrichment_plugins()
