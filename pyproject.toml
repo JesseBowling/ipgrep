@@ -56,6 +56,33 @@ markers = [
     "ratelimit: marks tests that may encounter rate limits"
 ]
 
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",                 # Exclude test files
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/virtualenv/*",
+    "*/.venv/*",
+    "*/__init__.py",             # Exclude __init__ files
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",          # Lines with this comment are skipped
+    "def __repr__",              # Exclude __repr__ methods
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",         # Exclude type checking blocks
+    "class .*\\bProtocol\\):",   # Exclude Protocol classes
+    "@(abc\\.)?abstractmethod",  # Exclude abstract methods
+]
+
 [dependency-groups]
 dev = [
     "black>=25.9.0",
