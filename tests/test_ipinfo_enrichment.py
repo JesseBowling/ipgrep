@@ -210,7 +210,7 @@ class TestIPInfoEnrichment:
         result = enrichment.enrich(ip_data)
 
         # Verify no fields starting with underscore
-        for key in result.keys():
+        for key in result:
             if key.startswith("ipinfo_"):
                 field_name = key.replace("ipinfo_", "")
                 assert not field_name.startswith("_"), (
