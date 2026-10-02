@@ -16,8 +16,8 @@ dependencies = [
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "black>=23.7.0",
     "requests-mock>=1.11.0",
+    "ruff>=0.16.10",
 ]
 
 [project.scripts]
@@ -41,9 +41,13 @@ pipe = "ipgrep.plugins.output.pipe_delimited:PipeDelimitedOutput"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ["py311"]
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# No `select`: use ruff's default rule set (it already includes I001 import sorting).
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -85,8 +89,8 @@ exclude_lines = [
 
 [dependency-groups]
 dev = [
-    "black>=25.9.0",
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "requests-mock>=1.12.1",
+    "ruff>=0.16.10",
 ]
