@@ -8,28 +8,20 @@ on:
 
 jobs:
   test:
-    name: Test Python ${{ matrix.python-version }}
+    name: Test (latest Python)
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.13"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install uv
+      # setup-uv exports UV_PYTHON, so uv uses this version instead of .python-version.
+      - name: Install uv and Python
         uses: astral-sh/setup-uv@v6
         with:
+          python-version: "3.14"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
