@@ -2,46 +2,56 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and attach assets for (e.g. v0.1.3)'
+        required: true
+        type: string
 
 jobs:
   release:
     name: Build and Release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-      packages: write
-    
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-      
+        with:
+          ref: refs/tags/${{ env.TAG }}
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
-      
+
       - name: Extract version from tag
         id: tag_version
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "version=$TAG" >> $GITHUB_OUTPUT
-          echo "Tag version: $TAG"
-      
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: tag '$TAG' does not match vX.Y.Z"
+            exit 1
+          fi
+          VERSION=${TAG#v}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Tag version: $VERSION"
+
       - name: Extract version from pyproject.toml
         id: project_version
         run: |
-          VERSION=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Project version: $VERSION"
-      
+
       - name: Verify version match
         run: |
           if [ "${{ steps.tag_version.outputs.version }}" != "${{ steps.project_version.outputs.version }}" ]; then
@@ -49,26 +59,33 @@ jobs:
             exit 1
           fi
           echo "Version match confirmed: ${{ steps.tag_version.outputs.version }}"
-      
-      - name: Install dependencies
-        run: uv sync --all-extras
-      
+
       - name: Build package
         run: uv build
-      
+
       - name: Create release archive
         run: |
           cd dist
-          zip -r ../release-${{ steps.tag_version.outputs.version }}.zip *
+          zip -r ../release-${{ steps.tag_version.outputs.version }}.zip ./*
           cd ..
-      
-      - name: Create GitHub Release
+
+      - name: Create or update GitHub Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ steps.tag_version.outputs.version }}
         run: |
-          gh release create v${{ steps.tag_version.outputs.version }} \
-            dist/*.whl \
-            dist/*.tar.gz \
-            release-${{ steps.tag_version.outputs.version }}.zip \
-            --title "Release ${{ steps.tag_version.outputs.version }}"
+          ASSETS=(dist/*.whl dist/*.tar.gz "release-${VERSION}.zip")
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            # Release already exists (e.g. created by hand in the GitHub UI, which
+            # also creates the tag that triggered this run). Attach assets only;
+            # leave its title and notes untouched.
+            echo "Release $TAG exists; uploading assets"
+            gh release upload "$TAG" "${ASSETS[@]}" --clobber
+          else
+            echo "Release $TAG not found; creating it"
+            gh release create "$TAG" "${ASSETS[@]}" \
+              --verify-tag \
+              --title "Release ${VERSION}" \
+              --generate-notes
+          fi
