@@ -36,7 +36,7 @@ class CSVOutput(OutputPlugin):
         additional_fields = set()
 
         for ip_data in ip_data_list:
-            for key in ip_data.keys():
+            for key in ip_data:
                 if key != "ip":
                     additional_fields.add(key)
 

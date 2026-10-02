@@ -2,12 +2,8 @@
 
 import sys
 from abc import ABC, abstractmethod
+from importlib.metadata import entry_points
 from typing import Any
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points
-else:
-    from importlib_metadata import entry_points
 
 
 class EnrichmentPlugin(ABC):
@@ -96,7 +92,7 @@ class PluginManager:
             try:
                 plugin_class = ep.load()
                 plugins[ep.name] = plugin_class
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - third-party plugin import may raise anything
                 print(
                     f"Warning: Failed to load enrichment plugin '{ep.name}': {e}",
                     file=sys.stderr,
@@ -126,7 +122,7 @@ class PluginManager:
             try:
                 plugin_class = ep.load()
                 plugins[ep.name] = plugin_class
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - third-party plugin import may raise anything
                 print(
                     f"Warning: Failed to load output plugin '{ep.name}': {e}",
                     file=sys.stderr,

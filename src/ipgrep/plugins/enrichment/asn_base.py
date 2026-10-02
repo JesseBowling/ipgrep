@@ -65,10 +65,12 @@ class ASNEnrichmentBase(EnrichmentPlugin):
                     return None
             except requests.exceptions.HTTPError as e:
                 # Rate limiting or server error
-                if e.response.status_code in (429, 500, 502, 503, 504):
-                    if attempt < len(retry_delays) - 1:
-                        time.sleep(delay)
-                        continue
+                if (
+                    e.response.status_code in (429, 500, 502, 503, 504)
+                    and attempt < len(retry_delays) - 1
+                ):
+                    time.sleep(delay)
+                    continue
                 return None
             except requests.exceptions.RequestException:
                 # Network error

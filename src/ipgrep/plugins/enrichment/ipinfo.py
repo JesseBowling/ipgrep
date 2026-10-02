@@ -2,7 +2,7 @@
 
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -66,8 +66,8 @@ class IPInfoEnrichment(EnrichmentPlugin):
                 db_path = Path(self._client.path)
                 if db_path.exists():
                     # Get modification time
-                    mod_time = datetime.fromtimestamp(db_path.stat().st_mtime)
-                    age = datetime.now() - mod_time
+                    mod_time = datetime.fromtimestamp(db_path.stat().st_mtime, tz=UTC)
+                    age = datetime.now(UTC) - mod_time
 
                     # If older than 1 day, recreate with replace=True
                     if age > timedelta(days=1):
@@ -142,7 +142,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
                 prefix = self._get_field_prefix()
                 ip_data[f"{prefix}_error"] = "not_found"
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - mark this IP failed, do not abort the run
             logger.error(f"Error looking up IP {ip_str}: {e}")
             prefix = self._get_field_prefix()
             ip_data[f"{prefix}_error"] = "lookup_failed"

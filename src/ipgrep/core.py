@@ -13,8 +13,8 @@ class IPGrepPipeline:
         self,
         extract_cidr: bool = False,
         defang: bool = False,
-        enrichments: list[EnrichmentPlugin] = None,
-        output_plugin: OutputPlugin = None,
+        enrichments: list[EnrichmentPlugin] | None = None,
+        output_plugin: OutputPlugin | None = None,
     ):
         """Initialize the pipeline.
 
