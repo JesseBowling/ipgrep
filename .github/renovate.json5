@@ -1,0 +1,37 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: ['config:recommended'],
+
+  // pyproject.toml + uv.lock (pep621) and workflow actions only.
+  enabledManagers: ['pep621', 'github-actions'],
+
+  // Schedule note: .github/workflows/renovate.yaml decides when Renovate runs
+  // (Saturday 03:00 UTC). Normal updates have no schedule here, so they are
+  // created on every run. Lock file maintenance has a default schedule of
+  // "before 4am on monday", which never matches a Saturday run, so it is set
+  // to "on saturday". If you change the cron, change this schedule too.
+  timezone: 'UTC',
+
+  dependencyDashboard: true,
+
+  // Renovate runs once a week, so do not hold PRs back to the default of
+  // 2 per hour. prConcurrentLimit (default 10 open PRs) still applies.
+  prHourlyLimit: 0,
+
+  // Refresh uv.lock (all transitive deps) once a week.
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ['on saturday'],
+  },
+
+  // Automerge is off. See docs/RENOVATE.md to turn it on.
+  automerge: false,
+
+  packageRules: [
+    {
+      description: 'One PR for all GitHub Actions updates',
+      matchManagers: ['github-actions'],
+      groupName: 'GitHub Actions',
+    },
+  ],
+}
