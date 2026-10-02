@@ -1,6 +1,7 @@
 """Space delimited output plugin."""
 
-from typing import List, Dict, Any
+from typing import Any
+
 from ipgrep.plugins.base import OutputPlugin
 
 
@@ -14,7 +15,7 @@ class SpaceDelimitedOutput(OutputPlugin):
         """Return the name of this output plugin."""
         return "space"
 
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the IP data as space-delimited text.
 
         Args:

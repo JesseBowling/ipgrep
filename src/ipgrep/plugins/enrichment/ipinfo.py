@@ -1,15 +1,14 @@
 """IPInfo enrichment plugin using ipinfo-db library."""
 
-import os
 import logging
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
 
 import ipinfo_db
 
 from ipgrep.plugins.base import EnrichmentPlugin
-
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
     Recreates database if older than 1 day.
     """
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize IPInfo enrichment plugin.
 
         Args:
@@ -87,7 +86,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
             logger.error(f"Failed to initialize IPInfo client: {e}")
             raise
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with IPInfo information.
 
         Args:

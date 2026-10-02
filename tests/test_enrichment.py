@@ -1,7 +1,9 @@
 """Tests for enrichment plugins."""
 
 import pytest
+
 from ipgrep.plugins.enrichment.ipaddress_enrichment import IPAddressEnrichment
+
 
 @pytest.mark.local
 class TestIPAddressEnrichment:

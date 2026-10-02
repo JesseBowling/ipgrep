@@ -1,9 +1,10 @@
 """Tests for CLI functionality."""
 
-import pytest
-import sys
 import io
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
+
+import pytest
+
 from ipgrep.cli import main
 
 
@@ -41,7 +42,7 @@ class TestCLIBasicUsage:
     def test_file_not_found(self):
         """Test error handling for missing file."""
         with patch("sys.argv", ["ipgrep", "-f", "nonexistent.txt"]):
-            with patch("builtins.open", side_effect=IOError("File not found")):
+            with patch("builtins.open", side_effect=OSError("File not found")):
                 with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
                     with pytest.raises(SystemExit) as exc_info:
                         main()
@@ -51,12 +52,11 @@ class TestCLIBasicUsage:
 
     def test_empty_input(self):
         """Test handling of empty input."""
-        with patch("sys.stdin", io.StringIO("")):
-            with patch("sys.argv", ["ipgrep"]):
-                with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-                    main()
-                    output = mock_stdout.getvalue()
-                    assert output == ""
+        with patch("sys.stdin", io.StringIO("")), patch("sys.argv", ["ipgrep"]):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+                main()
+                output = mock_stdout.getvalue()
+                assert output == ""
 
     def test_no_ips_in_input(self):
         """Test handling when no IPs are found."""
@@ -439,21 +439,29 @@ class TestCLIIntegration:
     def test_multiple_flags_and_enrichments(self):
         """Test combining multiple flags with multiple enrichments."""
         test_content = "IOC: 192[.]168[.]1[.]0/24"
-        with patch("sys.argv", [
-            "ipgrep",
-            "-f", "threats.txt",
-            "-c",
-            "-g",
-            "-e", "ipaddress",
-            "-o", "space"
-        ]):
-            with patch("builtins.open", mock_open(read_data=test_content)):
-                with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-                    main()
-                    output = mock_stdout.getvalue()
-                    assert "192.168.1.0" in output
-                    assert "24" in output
-                    assert "private" in output
+        with (
+            patch(
+                "sys.argv",
+                [
+                    "ipgrep",
+                    "-f",
+                    "threats.txt",
+                    "-c",
+                    "-g",
+                    "-e",
+                    "ipaddress",
+                    "-o",
+                    "space",
+                ],
+            ),
+            patch("builtins.open", mock_open(read_data=test_content)),
+        ):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+                main()
+                output = mock_stdout.getvalue()
+                assert "192.168.1.0" in output
+                assert "24" in output
+                assert "private" in output
 
     def test_stdin_pipeline_with_multiple_ips(self):
         """Test stdin with multiple IPs and enrichment."""

@@ -1,6 +1,7 @@
 """Pipe delimited output plugin."""
 
-from typing import List, Dict, Any
+from typing import Any
+
 from ipgrep.plugins.base import OutputPlugin
 
 
@@ -14,7 +15,7 @@ class PipeDelimitedOutput(OutputPlugin):
         """Return the name of this output plugin."""
         return "pipe"
 
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the IP data as pipe-delimited text.
 
         Args:

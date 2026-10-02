@@ -1,9 +1,7 @@
 """IP address and CIDR extraction from arbitrary text."""
 
-import re
 import ipaddress
-from typing import Set, Tuple
-from urllib.parse import urlparse
+import re
 
 
 class IPExtractor:
@@ -33,7 +31,7 @@ class IPExtractor:
         self.extract_cidr = extract_cidr
         self.defang = defang
 
-    def extract(self, text: str) -> Set[Tuple[str, str]]:
+    def extract(self, text: str) -> set[tuple[str, str]]:
         """Extract unique IP addresses from text.
 
         Args:
@@ -57,7 +55,7 @@ class IPExtractor:
 
         return results
 
-    def _extract_ipv4(self, text: str) -> Set[Tuple[str, str]]:
+    def _extract_ipv4(self, text: str) -> set[tuple[str, str]]:
         """Extract IPv4 addresses from text."""
         results = set()
 
@@ -104,7 +102,7 @@ class IPExtractor:
 
         return results
 
-    def _extract_ipv6(self, text: str) -> Set[Tuple[str, str]]:
+    def _extract_ipv6(self, text: str) -> set[tuple[str, str]]:
         """Extract IPv6 addresses from text."""
         results = set()
 
@@ -185,10 +183,10 @@ class IPExtractor:
         text = text.replace("(.)", ".")
 
         # Replace [dot] and [DOT] with . (case insensitive)
-        text = re.sub(r'\[dot\]', '.', text, flags=re.IGNORECASE)
+        text = re.sub(r"\[dot\]", ".", text, flags=re.IGNORECASE)
 
         # Replace (dot) and (DOT) with . (case insensitive)
-        text = re.sub(r'\(dot\)', '.', text, flags=re.IGNORECASE)
+        text = re.sub(r"\(dot\)", ".", text, flags=re.IGNORECASE)
 
         return text
 

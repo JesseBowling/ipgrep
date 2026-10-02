@@ -1,7 +1,8 @@
 """JSON output plugin."""
 
 import json
-from typing import List, Dict, Any
+from typing import Any
+
 from ipgrep.plugins.base import OutputPlugin
 
 
@@ -15,7 +16,7 @@ class JSONOutput(OutputPlugin):
         """Return the name of this output plugin."""
         return "json"
 
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the IP data as JSON.
 
         Args:

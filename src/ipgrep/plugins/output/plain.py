@@ -1,6 +1,7 @@
 """Plain text output plugin (one IP per line)."""
 
-from typing import List, Dict, Any
+from typing import Any
+
 from ipgrep.plugins.base import OutputPlugin
 
 
@@ -15,7 +16,7 @@ class PlainOutput(OutputPlugin):
         """Return the name of this output plugin."""
         return "plain"
 
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the IP data as plain text.
 
         Args:

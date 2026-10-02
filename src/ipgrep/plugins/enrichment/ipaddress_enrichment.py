@@ -1,7 +1,8 @@
 """IPAddress enrichment plugin using Python's ipaddress library."""
 
 import ipaddress
-from typing import Dict, Any, List
+from typing import Any
+
 from ipgrep.plugins.base import EnrichmentPlugin
 
 
@@ -42,7 +43,7 @@ class IPAddressEnrichment(EnrichmentPlugin):
         """Return the name of this enrichment plugin."""
         return "ipaddress"
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with classification information.
 
         Args:

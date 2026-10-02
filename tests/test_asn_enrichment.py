@@ -1,9 +1,11 @@
 """Tests for ASN enrichment plugins using real API calls."""
 
 import pytest
+
 from ipgrep.plugins.enrichment.asn_origin import OriginEnrichment
 from ipgrep.plugins.enrichment.asn_peer import PeerEnrichment
 from ipgrep.plugins.enrichment.asn_prefix import PrefixEnrichment
+
 
 @pytest.mark.remote
 @pytest.mark.ratelimit
@@ -28,7 +30,10 @@ class TestOriginEnrichment:
 
         # Verify specific known values for Google DNS
         assert result["asn_origin_asn"] == "15169"
-        assert "Google" in result["asn_origin_as_name"] or "GOOGLE" in result["asn_origin_as_name"]
+        assert (
+            "Google" in result["asn_origin_as_name"]
+            or "GOOGLE" in result["asn_origin_as_name"]
+        )
         assert result["asn_origin_prefix"] == "8.8.8.0/24"
 
     def test_single_ipv6_lookup(self):
@@ -85,7 +90,11 @@ class TestOriginEnrichment:
 
         # Private IPs typically don't have ASN info
         # Should either have error or no data
-        assert "asn_origin_error" in result or "asn_origin_asn" not in result or result.get("asn_origin_asn") == ""
+        assert (
+            "asn_origin_error" in result
+            or "asn_origin_asn" not in result
+            or result.get("asn_origin_asn") == ""
+        )
 
     def test_preserves_existing_fields(self):
         """Test that enrichment preserves existing fields."""
@@ -100,6 +109,7 @@ class TestOriginEnrichment:
         assert result["classification"] == "global"
         # New fields should be added
         assert "asn_origin_asn" in result
+
 
 @pytest.mark.remote
 @pytest.mark.ratelimit
@@ -162,6 +172,7 @@ class TestPeerEnrichment:
         assert "asn_peer_asn" in result or "asn_peer_asns" in result
         if "asn_peer_asn" in result:
             assert result["asn_peer_asn"] == "15169"
+
 
 @pytest.mark.remote
 @pytest.mark.ratelimit
@@ -239,6 +250,7 @@ class TestPrefixEnrichment:
         # Should have origin error or no ASN
         # Which should prevent prefix lookup
         assert "asn_prefix_error" in result or "asn_origin_error" in result
+
 
 @pytest.mark.remote
 @pytest.mark.ratelimit

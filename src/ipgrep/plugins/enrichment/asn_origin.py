@@ -1,6 +1,7 @@
 """Origin ASN enrichment plugin using Shadowserver API."""
 
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
 
 
@@ -16,7 +17,7 @@ class OriginEnrichment(ASNEnrichmentBase):
     - Additional metadata
     """
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize Origin enrichment plugin.
 
         Args:
@@ -28,7 +29,7 @@ class OriginEnrichment(ASNEnrichmentBase):
         """Return the name of this enrichment plugin."""
         return "asn_origin"
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with origin ASN information.
 
         Args:
@@ -55,8 +56,8 @@ class OriginEnrichment(ASNEnrichmentBase):
         return ip_data
 
     def _query_batch(
-        self, ips: List[str], query_type: str
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+        self, ips: list[str], query_type: str
+    ) -> dict[str, dict[str, Any] | None]:
         """Query a batch of IPs for origin data.
 
         Args:
@@ -92,7 +93,7 @@ class OriginEnrichment(ASNEnrichmentBase):
 
         return results
 
-    def _format_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_data(self, raw_data: dict[str, Any]) -> dict[str, Any]:
         """Format raw origin API data.
 
         Args:

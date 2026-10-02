@@ -1,6 +1,7 @@
 """Core processing pipeline for ipgrep."""
 
-from typing import List, Dict, Any, Set, Tuple
+from typing import Any
+
 from ipgrep.extractor import IPExtractor
 from ipgrep.plugins.base import EnrichmentPlugin, OutputPlugin
 
@@ -12,7 +13,7 @@ class IPGrepPipeline:
         self,
         extract_cidr: bool = False,
         defang: bool = False,
-        enrichments: List[EnrichmentPlugin] = None,
+        enrichments: list[EnrichmentPlugin] = None,
         output_plugin: OutputPlugin = None,
     ):
         """Initialize the pipeline.
@@ -55,7 +56,7 @@ class IPGrepPipeline:
             # Default to plain output (one IP per line)
             return self._default_format(ip_data_list)
 
-    def _tuples_to_data(self, ip_tuples: Set[Tuple[str, str]]) -> List[Dict[str, Any]]:
+    def _tuples_to_data(self, ip_tuples: set[tuple[str, str]]) -> list[dict[str, Any]]:
         """Convert IP tuples to data dictionaries.
 
         Args:
@@ -72,7 +73,7 @@ class IPGrepPipeline:
             ip_data_list.append(data)
         return ip_data_list
 
-    def _default_format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def _default_format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Default formatting (plain output).
 
         Args:

@@ -1,9 +1,10 @@
 """Base class for ASN enrichment plugins using Shadowserver API."""
 
-import time
 import ipaddress
+import time
 from abc import abstractmethod
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 import requests
 
 from ipgrep.plugins.base import EnrichmentPlugin
@@ -21,7 +22,7 @@ class ASNEnrichmentBase(EnrichmentPlugin):
     RATE_LIMIT_DELAY = 1.0  # 1 second delay between batches
     MAX_TIMEOUT = 10.0
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize ASN enrichment plugin.
 
         Args:
@@ -35,8 +36,8 @@ class ASNEnrichmentBase(EnrichmentPlugin):
         return self._field_prefix if self._field_prefix else self.name()
 
     def _api_request_with_retry(
-        self, endpoint: str, params: Optional[Dict[str, str]] = None
-    ) -> Optional[Dict[str, Any]]:
+        self, endpoint: str, params: dict[str, str] | None = None
+    ) -> dict[str, Any] | None:
         """Make API request with exponential backoff retry.
 
         Args:
@@ -79,8 +80,8 @@ class ASNEnrichmentBase(EnrichmentPlugin):
         return None
 
     def _bulk_query(
-        self, ips: List[str], query_type: str
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+        self, ips: list[str], query_type: str
+    ) -> dict[str, dict[str, Any] | None]:
         """Perform bulk query for multiple IPs with rate limiting.
 
         Shadowserver API allows 10 IPs per request, max 1 request per second.
@@ -112,8 +113,8 @@ class ASNEnrichmentBase(EnrichmentPlugin):
 
     @abstractmethod
     def _query_batch(
-        self, ips: List[str], query_type: str
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+        self, ips: list[str], query_type: str
+    ) -> dict[str, dict[str, Any] | None]:
         """Query a batch of IPs. Must be implemented by subclasses.
 
         Args:
@@ -123,10 +124,9 @@ class ASNEnrichmentBase(EnrichmentPlugin):
         Returns:
             Dictionary mapping IP to response data.
         """
-        pass
 
     @abstractmethod
-    def _format_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_data(self, raw_data: dict[str, Any]) -> dict[str, Any]:
         """Format raw API data for output. Must be implemented by subclasses.
 
         Args:
@@ -135,9 +135,8 @@ class ASNEnrichmentBase(EnrichmentPlugin):
         Returns:
             Formatted data dictionary with appropriate field names.
         """
-        pass
 
-    def _extract_first_host(self, ip_data: Dict[str, Any]) -> str:
+    def _extract_first_host(self, ip_data: dict[str, Any]) -> str:
         """Extract first host IP from ip_data.
 
         If CIDR notation is present, returns the first usable host IP.
@@ -170,8 +169,8 @@ class ASNEnrichmentBase(EnrichmentPlugin):
         return ip_str
 
     def _add_prefixed_fields(
-        self, ip_data: Dict[str, Any], new_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ip_data: dict[str, Any], new_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Add fields with plugin name prefix.
 
         Args:
@@ -189,7 +188,7 @@ class ASNEnrichmentBase(EnrichmentPlugin):
 
         return ip_data
 
-    def enrich_batch(self, ip_data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def enrich_batch(self, ip_data_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Enrich multiple IPs efficiently using bulk queries.
 
         Override base class to implement efficient batching for API calls.
