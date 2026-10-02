@@ -164,7 +164,7 @@ class ASNEnrichmentBase(EnrichmentPlugin):
                 else:
                     # Network has no hosts (e.g., /32 or /128), use the address itself
                     return str(network.network_address)
-            except (ValueError, IndexError):
+            except ValueError, IndexError:
                 # Fall back to original IP
                 return ip_str
 
