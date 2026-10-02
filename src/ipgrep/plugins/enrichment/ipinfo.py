@@ -1,15 +1,14 @@
 """IPInfo enrichment plugin using ipinfo-db library."""
 
-import os
 import logging
-from datetime import datetime, timedelta
+import os
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
 
 import ipinfo_db
 
 from ipgrep.plugins.base import EnrichmentPlugin
-
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
     Recreates database if older than 1 day.
     """
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize IPInfo enrichment plugin.
 
         Args:
@@ -67,8 +66,8 @@ class IPInfoEnrichment(EnrichmentPlugin):
                 db_path = Path(self._client.path)
                 if db_path.exists():
                     # Get modification time
-                    mod_time = datetime.fromtimestamp(db_path.stat().st_mtime)
-                    age = datetime.now() - mod_time
+                    mod_time = datetime.fromtimestamp(db_path.stat().st_mtime, tz=UTC)
+                    age = datetime.now(UTC) - mod_time
 
                     # If older than 1 day, recreate with replace=True
                     if age > timedelta(days=1):
@@ -87,7 +86,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
             logger.error(f"Failed to initialize IPInfo client: {e}")
             raise
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with IPInfo information.
 
         Args:
@@ -143,7 +142,7 @@ class IPInfoEnrichment(EnrichmentPlugin):
                 prefix = self._get_field_prefix()
                 ip_data[f"{prefix}_error"] = "not_found"
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - mark this IP failed, do not abort the run
             logger.error(f"Error looking up IP {ip_str}: {e}")
             prefix = self._get_field_prefix()
             ip_data[f"{prefix}_error"] = "lookup_failed"

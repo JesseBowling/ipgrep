@@ -3,6 +3,7 @@
 import argparse
 import logging
 import sys
+
 from ipgrep.core import IPGrepPipeline
 from ipgrep.plugins.base import PluginManager
 
@@ -101,14 +102,14 @@ Examples:
     if args.debug:
         logging.basicConfig(
             level=logging.DEBUG,
-            format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s',
+            format="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
             stream=sys.stderr,
         )
     else:
         # Default to WARNING level
         logging.basicConfig(
             level=logging.WARNING,
-            format='%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s',
+            format="%(asctime)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
             stream=sys.stderr,
         )
 
@@ -141,7 +142,7 @@ Examples:
         try:
             with open(args.file, "r", encoding="utf-8") as f:
                 text = f.read()
-        except IOError as e:
+        except OSError as e:
             print(f"Error reading file: {e}", file=sys.stderr)
             sys.exit(1)
     else:

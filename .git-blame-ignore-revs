@@ -1,0 +1,8 @@
+# Revisions that only reformat code. Use with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Apply ruff format and ruff check --fix
+8d5268eb7f5ea241ee1d5ee67aab58b5c09f6822
+
+# Merge nested with-statements in tests (re-indent only)
+4ea7ebfc391b73f95896c8aadec3c0ec80af8406

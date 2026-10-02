@@ -2,7 +2,8 @@
 
 import csv
 import io
-from typing import List, Dict, Any
+from typing import Any
+
 from ipgrep.plugins.base import OutputPlugin
 
 
@@ -17,7 +18,7 @@ class CSVOutput(OutputPlugin):
         """Return the name of this output plugin."""
         return "csv"
 
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the IP data as CSV.
 
         Args:
@@ -35,7 +36,7 @@ class CSVOutput(OutputPlugin):
         additional_fields = set()
 
         for ip_data in ip_data_list:
-            for key in ip_data.keys():
+            for key in ip_data:
                 if key != "ip":
                     additional_fields.add(key)
 
@@ -44,7 +45,7 @@ class CSVOutput(OutputPlugin):
 
         # Write CSV to string buffer
         output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator='\n')
+        writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator="\n")
 
         writer.writeheader()
         for ip_data in ip_data_list:

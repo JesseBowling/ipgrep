@@ -1,11 +1,14 @@
 """Tests for core pipeline functionality."""
 
+import json
+
 import pytest
+
 from ipgrep.core import IPGrepPipeline
 from ipgrep.plugins.enrichment.ipaddress_enrichment import IPAddressEnrichment
-from ipgrep.plugins.output.plain import PlainOutput
 from ipgrep.plugins.output.json import JSONOutput
-import json
+from ipgrep.plugins.output.plain import PlainOutput
+
 
 @pytest.mark.local
 class TestPipelineBasics:
@@ -32,6 +35,7 @@ class TestPipelineBasics:
         result = pipeline.process("")
         assert result == ""
 
+
 @pytest.mark.local
 class TestPipelineWithCIDR:
     """Test pipeline with CIDR extraction."""
@@ -49,6 +53,7 @@ class TestPipelineWithCIDR:
         text = "Host 192.168.1.1"
         result = pipeline.process(text)
         assert "192.168.1.1/32" in result
+
 
 @pytest.mark.local
 class TestPipelineWithEnrichment:
@@ -77,6 +82,7 @@ class TestPipelineWithEnrichment:
         # Second enrichment should override classification with comma delimiter
         assert "classification" in parsed[0]
 
+
 @pytest.mark.local
 class TestPipelineWithOutput:
     """Test pipeline with different output formats."""
@@ -98,6 +104,7 @@ class TestPipelineWithOutput:
         text = "IP: 192.168.1.1"
         result = pipeline.process(text)
         assert result == "192.168.1.1"
+
 
 @pytest.mark.local
 class TestEndToEnd:

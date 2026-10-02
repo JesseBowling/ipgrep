@@ -1,6 +1,7 @@
 """Peer ASN enrichment plugin using Shadowserver API."""
 
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
 
 
@@ -13,7 +14,7 @@ class PeerEnrichment(ASNEnrichmentBase):
     - Peering relationships
     """
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize Peer enrichment plugin.
 
         Args:
@@ -25,7 +26,7 @@ class PeerEnrichment(ASNEnrichmentBase):
         """Return the name of this enrichment plugin."""
         return "asn_peer"
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with peer ASN information.
 
         Args:
@@ -52,8 +53,8 @@ class PeerEnrichment(ASNEnrichmentBase):
         return ip_data
 
     def _query_batch(
-        self, ips: List[str], query_type: str
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+        self, ips: list[str], query_type: str
+    ) -> dict[str, dict[str, Any] | None]:
         """Query a batch of IPs for peer data.
 
         Args:
@@ -89,7 +90,7 @@ class PeerEnrichment(ASNEnrichmentBase):
 
         return results
 
-    def _format_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_data(self, raw_data: dict[str, Any]) -> dict[str, Any]:
         """Format raw peer API data.
 
         Args:

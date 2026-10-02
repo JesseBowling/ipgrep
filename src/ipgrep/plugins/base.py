@@ -1,13 +1,9 @@
 """Base classes for ipgrep plugins."""
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List
 import sys
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points
-else:
-    from importlib_metadata import entry_points
+from abc import ABC, abstractmethod
+from importlib.metadata import entry_points
+from typing import Any
 
 
 class EnrichmentPlugin(ABC):
@@ -20,10 +16,9 @@ class EnrichmentPlugin(ABC):
     @abstractmethod
     def name(self) -> str:
         """Return the name of this enrichment plugin."""
-        pass
 
     @abstractmethod
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with additional fields.
 
         Args:
@@ -33,9 +28,8 @@ class EnrichmentPlugin(ABC):
         Returns:
             The enriched dictionary with additional fields added.
         """
-        pass
 
-    def enrich_batch(self, ip_data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def enrich_batch(self, ip_data_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Enrich multiple IP data entries at once (optional batch operation).
 
         Default implementation falls back to calling enrich() for each IP.
@@ -59,10 +53,9 @@ class OutputPlugin(ABC):
     @abstractmethod
     def name(self) -> str:
         """Return the name of this output plugin."""
-        pass
 
     @abstractmethod
-    def format(self, ip_data_list: List[Dict[str, Any]]) -> str:
+    def format(self, ip_data_list: list[dict[str, Any]]) -> str:
         """Format the list of IP data for output.
 
         Args:
@@ -72,14 +65,13 @@ class OutputPlugin(ABC):
         Returns:
             Formatted string ready for output.
         """
-        pass
 
 
 class PluginManager:
     """Manages plugin discovery and loading via entry points."""
 
     @staticmethod
-    def load_enrichment_plugins() -> Dict[str, type]:
+    def load_enrichment_plugins() -> dict[str, type]:
         """Load all available enrichment plugins.
 
         Returns:
@@ -100,7 +92,7 @@ class PluginManager:
             try:
                 plugin_class = ep.load()
                 plugins[ep.name] = plugin_class
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - third-party plugin import may raise anything
                 print(
                     f"Warning: Failed to load enrichment plugin '{ep.name}': {e}",
                     file=sys.stderr,
@@ -109,7 +101,7 @@ class PluginManager:
         return plugins
 
     @staticmethod
-    def load_output_plugins() -> Dict[str, type]:
+    def load_output_plugins() -> dict[str, type]:
         """Load all available output plugins.
 
         Returns:
@@ -130,7 +122,7 @@ class PluginManager:
             try:
                 plugin_class = ep.load()
                 plugins[ep.name] = plugin_class
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - third-party plugin import may raise anything
                 print(
                     f"Warning: Failed to load output plugin '{ep.name}': {e}",
                     file=sys.stderr,

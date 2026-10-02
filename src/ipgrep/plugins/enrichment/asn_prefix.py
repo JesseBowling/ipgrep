@@ -1,6 +1,7 @@
 """Prefix ASN enrichment plugin using Shadowserver API."""
 
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from ipgrep.plugins.enrichment.asn_base import ASNEnrichmentBase
 from ipgrep.plugins.enrichment.asn_origin import OriginEnrichment
 
@@ -13,7 +14,7 @@ class PrefixEnrichment(ASNEnrichmentBase):
     Keeps data from both Origin and Prefix queries.
     """
 
-    def __init__(self, field_prefix: Optional[str] = None):
+    def __init__(self, field_prefix: str | None = None):
         """Initialize Prefix enrichment plugin.
 
         Args:
@@ -27,7 +28,7 @@ class PrefixEnrichment(ASNEnrichmentBase):
         """Return the name of this enrichment plugin."""
         return "asn_prefix"
 
-    def enrich(self, ip_data: Dict[str, Any]) -> Dict[str, Any]:
+    def enrich(self, ip_data: dict[str, Any]) -> dict[str, Any]:
         """Enrich the IP data with prefix ASN information.
 
         First queries Origin to get the ASN, then queries prefix info.
@@ -67,7 +68,7 @@ class PrefixEnrichment(ASNEnrichmentBase):
 
         return ip_data
 
-    def enrich_batch(self, ip_data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def enrich_batch(self, ip_data_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Enrich multiple IPs with prefix data.
 
         Override to properly handle nested origin plugin enrichment.
@@ -83,7 +84,7 @@ class PrefixEnrichment(ASNEnrichmentBase):
         # plugin for each IP first, then query prefix data
         return [self.enrich(ip_data) for ip_data in ip_data_list]
 
-    def _query_prefix_for_asn(self, ip: str, asn: str) -> Optional[Dict[str, Any]]:
+    def _query_prefix_for_asn(self, ip: str, asn: str) -> dict[str, Any] | None:
         """Query prefix information for a specific ASN.
 
         Args:
@@ -103,8 +104,8 @@ class PrefixEnrichment(ASNEnrichmentBase):
         return data
 
     def _query_batch(
-        self, ips: List[str], query_type: str
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+        self, ips: list[str], query_type: str
+    ) -> dict[str, dict[str, Any] | None]:
         """Query a batch of IPs for prefix data.
 
         Note: This method is required by the base class but prefix queries
@@ -121,7 +122,7 @@ class PrefixEnrichment(ASNEnrichmentBase):
         # Return empty dict
         return {ip: None for ip in ips}
 
-    def _format_data(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_data(self, raw_data: dict[str, Any]) -> dict[str, Any]:
         """Format raw prefix API data.
 
         Args:

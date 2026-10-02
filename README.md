@@ -522,9 +522,15 @@ ipgrep handles various edge cases:
 ## Development
 
 ### Running Tests
-Some tests are rate-limited, so you may need to run test without the `ratelimit` marker to skip them:
+
+Some tests can hit API rate limits. To skip these tests, deselect the `ratelimit` marker:
 ```bash
 uv run pytest -m "not ratelimit"
+```
+
+Some tests need remote API access. To run only the local tests, also deselect the `remote` marker:
+```bash
+uv run pytest -m "not remote and not ratelimit"
 ```
 
 ### With Coverage
@@ -533,11 +539,26 @@ uv run pytest -m "not ratelimit"
 uv run pytest -m "not ratelimit" --cov=ipgrep --cov-report=html
 ```
 
-### Code Formatting
+### Linting and Formatting
 
+The project uses [ruff](https://docs.astral.sh/ruff/) to format and lint the code. The ruff settings are in the `[tool.ruff]` table of `pyproject.toml`.
+
+To format the code:
 ```bash
-uv run black src tests
+uv run ruff format src tests
 ```
+
+To lint the code:
+```bash
+uv run ruff check src tests
+```
+
+To fix the lint errors that ruff can fix safely, add `--fix`:
+```bash
+uv run ruff check --fix src tests
+```
+
+The `Lint` workflow in CI runs `ruff format --check` and `ruff check`. The workflow fails if a file needs formatting or has a lint error.
 
 ## Project Structure
 
@@ -584,7 +605,7 @@ runs, and schedule changes are in [docs/RENOVATE.md](docs/RENOVATE.md).
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.14+
 - Standard library only for core functionality
 - `requests` library for ASN enrichment plugins (optional)
 - `ipinfo-db` library for IPInfo enrichment plugin (optional)
@@ -595,12 +616,13 @@ GNU General Public License v3.0 (GPL-3.0)
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+Contributions are welcome. Before you open a pull request, make sure that:
 
-1. All tests pass (`uv run pytest`)
-2. Code is formatted with black (`uv run black src tests`)
-3. New features include tests
-4. Documentation is updated
+1. All tests pass (`uv run pytest`).
+2. The code is formatted (`uv run ruff format src tests`).
+3. The code has no lint errors (`uv run ruff check src tests`).
+4. New features have tests.
+5. The documentation shows your changes.
 
 ## Author
 

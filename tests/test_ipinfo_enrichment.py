@@ -1,7 +1,9 @@
 """Tests for IPInfo enrichment plugin using real API calls."""
 
 import os
+
 import pytest
+
 from ipgrep.plugins.enrichment.ipinfo import IPInfoEnrichment
 
 
@@ -208,8 +210,9 @@ class TestIPInfoEnrichment:
         result = enrichment.enrich(ip_data)
 
         # Verify no fields starting with underscore
-        for key in result.keys():
+        for key in result:
             if key.startswith("ipinfo_"):
                 field_name = key.replace("ipinfo_", "")
-                assert not field_name.startswith("_"), \
+                assert not field_name.startswith("_"), (
                     f"Found private attribute in output: {key}"
+                )

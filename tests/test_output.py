@@ -1,12 +1,15 @@
 """Tests for output plugins."""
 
 import json
+
 import pytest
-from ipgrep.plugins.output.plain import PlainOutput
+
 from ipgrep.plugins.output.csv import CSVOutput
 from ipgrep.plugins.output.json import JSONOutput
-from ipgrep.plugins.output.space_delimited import SpaceDelimitedOutput
 from ipgrep.plugins.output.pipe_delimited import PipeDelimitedOutput
+from ipgrep.plugins.output.plain import PlainOutput
+from ipgrep.plugins.output.space_delimited import SpaceDelimitedOutput
+
 
 @pytest.mark.local
 class TestPlainOutput:
@@ -34,6 +37,7 @@ class TestPlainOutput:
         plugin = PlainOutput()
         result = plugin.format([])
         assert result == ""
+
 
 @pytest.mark.local
 class TestCSVOutput:
@@ -79,6 +83,7 @@ class TestCSVOutput:
         result = plugin.format([])
         assert result == ""
 
+
 @pytest.mark.local
 class TestJSONOutput:
     """Test JSON output plugin."""
@@ -110,6 +115,7 @@ class TestJSONOutput:
         result = plugin.format([])
         parsed = json.loads(result)
         assert parsed == []
+
 
 @pytest.mark.local
 class TestSpaceDelimitedOutput:
@@ -148,6 +154,7 @@ class TestSpaceDelimitedOutput:
         plugin = SpaceDelimitedOutput()
         result = plugin.format([])
         assert result == ""
+
 
 @pytest.mark.local
 class TestPipeDelimitedOutput:
