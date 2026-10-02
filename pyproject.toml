@@ -61,7 +61,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["app"]
+source = ["ipgrep"]
 omit = [
     "*/tests/*",                 # Exclude test files
     "*/test_*.py",

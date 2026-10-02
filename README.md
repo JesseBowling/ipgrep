@@ -597,7 +597,7 @@ README.md
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.11+
 - Standard library only for core functionality
 - `requests` library for ASN enrichment plugins (optional)
 - `ipinfo-db` library for IPInfo enrichment plugin (optional)
