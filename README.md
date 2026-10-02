@@ -574,6 +574,14 @@ pyproject.toml
 README.md
 ```
 
+## Dependency updates (Renovate)
+
+Self-hosted [Renovate](https://docs.renovatebot.com/) runs every Saturday at 03:00 UTC
+(`.github/workflows/renovate.yaml`). It opens PRs for `pyproject.toml` / `uv.lock`
+dependencies and GitHub Actions versions, refreshes `uv.lock` weekly, and keeps a
+Dependency Dashboard issue. Automerge is off. Setup (GitHub App or PAT), manual and dry
+runs, and schedule changes are in [docs/RENOVATE.md](docs/RENOVATE.md).
+
 ## Requirements
 
 - Python 3.9+
